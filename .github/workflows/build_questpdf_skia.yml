@@ -18,12 +18,12 @@ jobs:
       matrix:
         runtime: 
         - name: win-x64
-          runs-on: windows-latest-xlarge
+          runs-on: windows-latest
         - name: linux-x64
-          runs-on: ubuntu-latest-xlarge
+          runs-on: ubuntu-latest
           container: ubuntu:19.04
         - name: linux-musl-x64
-          runs-on: ubuntu-latest-xlarge
+          runs-on: ubuntu-latest
           container: alpine:3.17
     env:
       ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true    
