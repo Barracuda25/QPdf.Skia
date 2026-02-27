@@ -12,7 +12,7 @@
 #include "include/core/SkData.h"
 #include "include/effects/SkImageFilters.h"
 #include "include/core/SkPaint.h"
-#include "include/effects/SkGradient.h"
+#include "include/effects/SkGradientShader.h"
 #include "include/encode/SkJpegEncoder.h"
 #include "include/encode/SkPngEncoder.h"
 
@@ -103,7 +103,7 @@ QUEST_API SkImage *image_generate_placeholder(int imageWidth, int imageHeight, S
     // create vertical gradient
     SkPoint points[2] = {SkPoint::Make(0, 0), SkPoint::Make(imageWidth, imageHeight)};
     SkColor colors[] = {firstColor, secondColor};
-    auto gradient = SkGradient::MakeLinear(points, colors, nullptr, 2, SkTileMode::kDecal);
+    auto gradient = SkGradientShader::MakeLinear(points, colors, nullptr, 2, SkTileMode::kDecal);
 
     // draw gradient
     SkPaint paint;
