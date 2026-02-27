@@ -103,7 +103,7 @@ jobs:
       - name: Build Skia
         shell: bash
         run: |
-          git clone https://github.com/google/skia.git --branch chrome/m144 --single-branch
+          git clone --depth 1 https://github.com/google/skia.git --branch chrome/m146 --single-branch
           cd skia
           git apply --ignore-whitespace ../patches/*.patch
           
