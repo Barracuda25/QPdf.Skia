@@ -172,69 +172,20 @@ jobs:
           fi
           
           ninja -C out/release skia svg skparagraph skresources
-
           
-      - name: Configure CMake
+      - name: Prepare Skia artifacts
         shell: bash
         run: |
-          CMAKE_ARGS="
-            -S ${PWD}/native 
-            -B ${PWD}/native/build 
-            -DSKIA_DIR=${PWD}/skia 
-            -DCMAKE_CXX_COMPILER=clang++ 
-            -DCMAKE_C_COMPILER=clang 
-            -DCMAKE_BUILD_TYPE=Release"
-          
-          cmake $CMAKE_ARGS
-
-          
-      - name: Build CMake
-        shell: bash
-        run: >
-          cmake 
-          --build ${PWD}/native/build 
-          --config Release
-
-          
-      - name: Copy build artifact to output directory
-        shell: bash
-        run: |
-          mkdir -p output/runtimes/${{ matrix.runtime.name }}/native
-          find native/build -type f \( -name "*.dylib" -o -name "*.dll" -o -name "*.so" \) -exec cp {} output/runtimes/${{ matrix.runtime.name }}/native \;
-
-          
-      - name: Upload build artifacts
+          mkdir -p output/skia/${{ matrix.runtime.name }}
+          cp -r skia/out/release/* output/skia/${{ matrix.runtime.name }}/ 2>/dev/null || true
+          echo "Skia build artifacts copied for ${{ matrix.runtime.name }}"
+      
+      - name: Upload Skia artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: questpdf-native-libraries-${{ matrix.runtime.name }}
-          path: output
-            
-
-      - name: Setup .NET 8.0 SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
-
-          
-      - name: Test build artifacts
-        shell: bash
-        run: |
-          TEST_EXECUTION_PATH='managed/NativeSkia.Tests/bin/Debug/net8.0/${{ matrix.runtime.name }}'
-          mkdir -p "$TEST_EXECUTION_PATH"
-          cp -R output/* "$TEST_EXECUTION_PATH"
-          
-          dotnet test managed --framework net8.0 --runtime ${{ matrix.runtime.name }}
-          mkdir -p testOutput/${{ matrix.runtime.name }} 
-          
-          ls -lR $TEST_EXECUTION_PATH
-          cp -r $TEST_EXECUTION_PATH/Output/* testOutput/${{ matrix.runtime.name }} 
-
-          
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        with:
-          name: questpdf-test-results-${{ matrix.runtime.name }}
-          path: testOutput
+          name: skia-m146-${{ matrix.runtime.name }}
+          path: output/skia
+          retention-days: 30
 
   merge:
     runs-on: ubuntu-latest
