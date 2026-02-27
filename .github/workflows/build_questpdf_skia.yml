@@ -20,8 +20,7 @@ jobs:
         - name: win-x64
           runs-on: windows-latest
         - name: linux-x64
-          runs-on: ubuntu-latest
-          container: ubuntu:19.04
+          runs-on: ubuntu-22.04          
         - name: linux-musl-x64
           runs-on: ubuntu-latest
           container: alpine:3.17
@@ -36,36 +35,20 @@ jobs:
         if: matrix.runtime.name == 'linux-x64'
         shell: bash
         run: |
-          sudo apt-get update --yes
-          sudo apt-get upgrade --yes
-          sudo apt-get install wget git cmake fontconfig --yes
+            sudo apt-get update -qq
+            sudo apt-get upgrade -qq --yes
+            sudo apt-get install -y wget git cmake fontconfig software-properties-common
 
           
       - name: Install Clang
         if: matrix.runtime.name == 'linux-x64' 
         shell: bash
         run: |
-          sudo apt-get install --yes software-properties-common
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
-          add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-15 main"
-          
-          sudo apt-get update --yes
-          sudo apt-get install --yes clang-15 lldb-15 lld-15 libstdc++-10-dev
-          
-          update-alternatives --install /usr/bin/cc cc /usr/bin/clang-15 100
-          update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-15 100
-          
-          update-alternatives --config cc
-          update-alternatives --config c++
-          
-          cc --version
-          c++ --version
-          update-alternatives --install /usr/bin/clang clang /usr/bin/clang-15 100
-          update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-15 100
-          
-          update-alternatives --config clang
-          update-alternatives --config clang++
-          
+          sudo apt-get install -y clang-15 lldb-15 lld-15 libstdc++-12-dev
+          sudo update-alternatives --install /usr/bin/cc cc /usr/bin/clang-15 100
+          sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-15 100
+          sudo update-alternatives --config cc
+          sudo update-alternatives --config c++
           clang --version
           clang++ --version
 
@@ -74,26 +57,22 @@ jobs:
         if: matrix.runtime.name == 'linux-x64'
         shell: bash
         run: |
-          wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
-          apt-add-repository 'deb https://apt.kitware.com/ubuntu/ focal main'
-          sudo apt-get update
-          sudo apt-get install cmake --yes
+          sudo apt-get install -y cmake
           cmake --version
-
-          
+      
       - name: Install Python 3.10
         if: matrix.runtime.name == 'linux-x64' 
         shell: bash
         run: |
-            sudo apt-get install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget --yes
-            wget https://www.python.org/ftp/python/3.10.19/Python-3.10.19.tgz
-            tar xzf Python-3.10.19.tgz
-            cd Python-3.10.19
-            
-            ./configure --enable-optimizations
-            make --silent
-            make install --silent
-            python3 --version
+          sudo apt-get install -y build-essential zlib1g-dev libncurses5-dev libgdbm-dev \
+                                  libnss3-dev libssl-dev libreadline-dev libffi-dev wget
+          wget https://www.python.org/ftp/python/3.10.19/Python-3.10.19.tgz
+          tar xzf Python-3.10.19.tgz
+          cd Python-3.10.19
+          ./configure --enable-optimizations
+          make -j2 --silent
+          sudo make install --silent
+          python3 --version
 
             
       - name: Install Build Tools (Alpine)
