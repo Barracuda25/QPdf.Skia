@@ -19,22 +19,12 @@ jobs:
         runtime: 
         - name: win-x64
           runs-on: windows-latest-xlarge
-        - name: win-x86
-          runs-on: windows-latest-xlarge
         - name: linux-x64
           runs-on: ubuntu-latest-xlarge
-          container: ubuntu:19.04
-        - name: linux-arm64
-          runs-on: ubuntu-latest-xlarge-arm64
           container: ubuntu:19.04
         - name: linux-musl-x64
           runs-on: ubuntu-latest-xlarge
           container: alpine:3.17
-        - name: osx-x64
-          runs-on: macos-latest-large
-        - name: osx-arm64
-          runs-on: macos-latest-xlarge
-
     env:
       ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true    
       DEBIAN_FRONTEND: noninteractive
@@ -52,23 +42,10 @@ jobs:
           deb http://archive.ubuntu.com/ubuntu/ focal-updates main restricted universe multiverse
           deb http://archive.ubuntu.com/ubuntu/ focal-backports main restricted universe multiverse
           deb http://security.ubuntu.com/ubuntu focal-security main restricted universe multiverse
-          EOF
-
-
-      - name: Install Dependencies (Linux)
-        if: matrix.runtime.name == 'linux-arm64'
-        shell: bash
-        run: |
-          cat > /etc/apt/sources.list << EOF
-          deb http://ports.ubuntu.com/ubuntu-ports/ focal main restricted universe multiverse
-          deb http://ports.ubuntu.com/ubuntu-ports/ focal-updates main restricted universe multiverse
-          deb http://ports.ubuntu.com/ubuntu-ports/ focal-backports main restricted universe multiverse
-          deb http://ports.ubuntu.com/ubuntu-ports/ focal-security main restricted universe multiverse
-          EOF
-          
+          EOF          
 
       - name: Install Build Tools
-        if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
+        if: matrix.runtime.name == 'linux-x64'
         shell: bash
         run: |
           apt update --yes
@@ -77,7 +54,7 @@ jobs:
 
           
       - name: Install Clang
-        if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
+        if: matrix.runtime.name == 'linux-x64' 
         shell: bash
         run: |
           apt install --yes software-properties-common
@@ -106,7 +83,7 @@ jobs:
 
           
       - name: Install Cmake
-        if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
+        if: matrix.runtime.name == 'linux-x64'
         shell: bash
         run: |
           wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
@@ -117,7 +94,7 @@ jobs:
 
           
       - name: Install Python 3.10
-        if: matrix.runtime.name == 'linux-x64' || matrix.runtime.name == 'linux-arm64'
+        if: matrix.runtime.name == 'linux-x64' 
         shell: bash
         run: |
             apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget --yes
@@ -220,11 +197,7 @@ jobs:
           if [ "${{ runner.os }}" = "macOS" ]; then
             COMMON_ARGS+=' skia_use_fonthost_mac=true'
           fi
-          
-          if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
-            COMMON_ARGS+=' target_cpu="x86"'
-          fi
-          
+                  
           if [ "${{ matrix.runtime.name }}" = "linux-musl-x64" ]; then
             gn gen out/release --args="$COMMON_ARGS"
           else
@@ -244,9 +217,6 @@ jobs:
             -DCMAKE_CXX_COMPILER=clang++ 
             -DCMAKE_C_COMPILER=clang 
             -DCMAKE_BUILD_TYPE=Release"
-          if [ "${{ matrix.runtime.name }}" = "win-x86" ]; then
-            CMAKE_ARGS+=" -A Win32"
-          fi
           
           cmake $CMAKE_ARGS
 
