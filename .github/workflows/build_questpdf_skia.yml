@@ -30,39 +30,27 @@ jobs:
       DEBIAN_FRONTEND: noninteractive
 
     steps:
-      - uses: actions/checkout@v4
-
-
-      - name: Install Dependencies (Linux)
-        if: matrix.runtime.name == 'linux-x64'
-        shell: bash
-        run: |
-          cat > /etc/apt/sources.list << EOF
-          deb http://archive.ubuntu.com/ubuntu/ focal main restricted universe multiverse
-          deb http://archive.ubuntu.com/ubuntu/ focal-updates main restricted universe multiverse
-          deb http://archive.ubuntu.com/ubuntu/ focal-backports main restricted universe multiverse
-          deb http://security.ubuntu.com/ubuntu focal-security main restricted universe multiverse
-          EOF          
+      - uses: actions/checkout@v4       
 
       - name: Install Build Tools
         if: matrix.runtime.name == 'linux-x64'
         shell: bash
         run: |
-          apt update --yes
-          apt upgrade --yes
-          apt install wget git cmake fontconfig --yes
+          sudo apt-get update --yes
+          sudo apt-get upgrade --yes
+          sudo apt-get install wget git cmake fontconfig --yes
 
           
       - name: Install Clang
         if: matrix.runtime.name == 'linux-x64' 
         shell: bash
         run: |
-          apt install --yes software-properties-common
+          sudo apt-get install --yes software-properties-common
           wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
           add-apt-repository "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-15 main"
           
-          apt update --yes
-          apt install --yes clang-15 lldb-15 lld-15 libstdc++-10-dev
+          sudo apt-get update --yes
+          sudo apt-get install --yes clang-15 lldb-15 lld-15 libstdc++-10-dev
           
           update-alternatives --install /usr/bin/cc cc /usr/bin/clang-15 100
           update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++-15 100
@@ -88,8 +76,8 @@ jobs:
         run: |
           wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | apt-key add -
           apt-add-repository 'deb https://apt.kitware.com/ubuntu/ focal main'
-          apt update
-          apt install cmake --yes
+          sudo apt-get update
+          sudo apt-get install cmake --yes
           cmake --version
 
           
@@ -97,7 +85,7 @@ jobs:
         if: matrix.runtime.name == 'linux-x64' 
         shell: bash
         run: |
-            apt install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget --yes
+            sudo apt-get install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev wget --yes
             wget https://www.python.org/ftp/python/3.10.19/Python-3.10.19.tgz
             tar xzf Python-3.10.19.tgz
             cd Python-3.10.19
