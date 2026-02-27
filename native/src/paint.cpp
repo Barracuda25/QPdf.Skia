@@ -1,7 +1,7 @@
 #include "include/core/SkSpan.h"
 #include "include/core/SkPathEffect.h"
 #include "include/effects/SkDashPathEffect.h"
-#include "include/effects/SkGradientShader.h"
+#include "include/effects/SkGradient.h"
 
 #include "include/core/SkTileMode.h"
 #include "include/core/SkPaint.h"
@@ -29,7 +29,7 @@ extern "C" {
             start, end
         };
 
-        const auto shader = SkGradientShader::MakeLinear(
+        const auto shader = SkGradient::MakeLinear(
             points,
             colors,
             nullptr,
